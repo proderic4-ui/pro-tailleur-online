@@ -12,7 +12,7 @@ export const btn = {
 };
 
 // Below this width there is no room for the full menu on one line, so the hamburger takes over.
-const DESKTOP = "min-[1100px]";
+// The class names must stay literal (min-[1100px]:flex / min-[1100px]:hidden) so Tailwind generates them.
 
 const nav = [
   { to: "/", label: "Accueil" },
@@ -40,23 +40,23 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl flex-nowrap items-center justify-between gap-4 px-4">
         <Logo />
-        <nav className={`hidden shrink-0 gap-6 ${DESKTOP}:flex`}>
+        <nav className="hidden shrink-0 gap-6 min-[1100px]:flex">
           {nav.map((n) => (
             <Link key={n.to} to={n.to} className="whitespace-nowrap text-sm font-medium text-muted-foreground hover:text-primary" activeProps={{ className: "text-primary" }} activeOptions={{ exact: true }}>
               {n.label}
             </Link>
           ))}
         </nav>
-        <div className={`hidden shrink-0 items-center gap-2 ${DESKTOP}:flex`}>
+        <div className="hidden shrink-0 items-center gap-2 min-[1100px]:flex">
           <Link to="/connexion" className={btn.outline}>Se connecter</Link>
           <Link to="/inscription" className={btn.primary}>Créer un compte</Link>
         </div>
-        <button className={`text-primary ${DESKTOP}:hidden`} onClick={() => setOpen(!open)} aria-label="Menu">
+        <button className="text-primary min-[1100px]:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
           {open ? <X /> : <Menu />}
         </button>
       </div>
       {open && (
-        <div className={`border-t px-4 py-4 ${DESKTOP}:hidden`}>
+        <div className="border-t px-4 py-4 min-[1100px]:hidden">
           <div className="flex flex-col gap-3">
             {nav.map((n) => (
               <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="whitespace-nowrap font-medium text-primary">{n.label}</Link>
