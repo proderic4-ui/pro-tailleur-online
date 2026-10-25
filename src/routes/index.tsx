@@ -1,24 +1,54 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import hero from "@/assets/hero-atelier.jpg";
+import { PageShell, btn, SectionTitle } from "@/components/site/ui";
+import { Features, Pricing, DashboardMock } from "@/components/site/sections";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Pro Tailleur Online — Votre atelier, plus proche de vous" },
+      { name: "description", content: "La plateforme de gestion pour tailleurs et couturiers africains : clients, mesures, commandes, paiements." },
+      { property: "og:title", content: "Pro Tailleur Online" },
+      { property: "og:description", content: "Gérez votre atelier de couture simplement, depuis votre téléphone." },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <PageShell>
+      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
+        <div>
+          <p className="inline-block rounded-full bg-gold-soft px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary">Lancement au Togo</p>
+          <h1 className="mt-5 text-4xl leading-tight text-primary md:text-6xl">
+            Votre atelier, <span className="text-gold">plus proche</span> de vous.
+          </h1>
+          <p className="mt-5 max-w-md text-lg text-muted-foreground">
+            Clients, mesures, commandes et paiements : gérez toute votre couture depuis votre téléphone.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/inscription" className={btn.primary}>Commencer gratuitement</Link>
+            <Link to="/connexion" className={btn.outline}>Se connecter</Link>
+          </div>
+        </div>
+        <img src={hero} alt="Tailleur prenant des mesures sur un tissu wax" width={1280} height={1024} className="aspect-[5/4] w-full rounded-3xl object-cover shadow-elegant" />
+      </section>
+      <Features />
+      <section className="py-20">
+        <div className="mx-auto max-w-5xl px-4">
+          <SectionTitle eyebrow="Tableau de bord" title="Votre atelier en un coup d'œil" />
+          <DashboardMock />
+        </div>
+      </section>
+      <Pricing />
+      <section className="bg-primary py-16 text-center text-primary-foreground">
+        <h2 className="text-3xl md:text-4xl">Prêt à moderniser votre atelier ?</h2>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link to="/inscription" className={btn.gold}>Créer un compte</Link>
+          <Link to="/connexion" className={btn.ghostLight}>Se connecter</Link>
+        </div>
+      </section>
+    </PageShell>
   );
 }
