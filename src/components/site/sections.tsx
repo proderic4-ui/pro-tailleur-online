@@ -32,9 +32,9 @@ export function Features() {
 }
 
 const plans = [
-  { name: "Gratuit", price: "0", period: "FCFA", perks: ["5 clients maximum", "3 commandes maximum", "Prise de mesures"], cta: "Commencer gratuitement", featured: false },
-  { name: "Mensuel", price: "2 000", period: "FCFA / mois", perks: ["Clients illimités", "Commandes illimitées", "Paiements et dépenses", "Statistiques"], cta: "Choisir Mensuel", featured: false },
-  { name: "Annuel", price: "15 000", period: "FCFA / an", perks: ["Tout le plan Mensuel", "Bilans annuels", "Notifications", "Économie de 9 000 FCFA"], cta: "Choisir Annuel", featured: true },
+  { name: "Gratuite", price: "0", period: "FCFA", perks: ["Accès à toutes les fonctionnalités pour découvrir la plateforme", "5 clients maximum", "3 commandes maximum"], cta: "Commencer gratuitement", featured: false },
+  { name: "Mensuelle", price: "2 000", period: "FCFA / mois", perks: ["Clients illimités", "Commandes illimitées", "Mesures et photos des modèles", "Paiements, reçus et dépenses", "Statistiques et bilans", "Notifications"], cta: "Choisir Mensuelle", featured: false },
+  { name: "Annuelle", price: "15 000", period: "FCFA / an", perks: ["Toutes les fonctionnalités de la formule Mensuelle", "Un seul paiement par an", "Économie de 9 000 FCFA par an"], cta: "Choisir Annuelle", featured: true },
 ];
 
 export function Pricing() {

@@ -3,13 +3,16 @@ import { useState, type ReactNode } from "react";
 import { Menu, X, Scissors } from "lucide-react";
 
 const btnBase =
-  "inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors";
+  "inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold transition-colors";
 export const btn = {
   primary: `${btnBase} bg-primary text-primary-foreground hover:bg-primary/90`,
   gold: `${btnBase} bg-gold text-primary hover:bg-gold/90`,
   outline: `${btnBase} border border-primary/20 text-primary hover:bg-secondary`,
   ghostLight: `${btnBase} border border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10`,
 };
+
+// Below this width there is no room for the full menu on one line, so the hamburger takes over.
+const DESKTOP = "min-[1100px]";
 
 const nav = [
   { to: "/", label: "Accueil" },
@@ -20,11 +23,11 @@ const nav = [
 
 export function Logo() {
   return (
-    <Link to="/" className="flex items-center gap-2">
-      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-gold">
+    <Link to="/" className="flex shrink-0 items-center gap-2">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-gold">
         <Scissors className="h-4 w-4" />
       </span>
-      <span className="font-display text-xl text-primary">
+      <span className="whitespace-nowrap font-display text-xl text-primary">
         Pro Tailleur <span className="text-gold">Online</span>
       </span>
     </Link>
@@ -35,28 +38,28 @@ export function Header() {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+      <div className="mx-auto flex h-16 max-w-6xl flex-nowrap items-center justify-between gap-4 px-4">
         <Logo />
-        <nav className="hidden gap-6 md:flex">
+        <nav className={`hidden shrink-0 gap-6 ${DESKTOP}:flex`}>
           {nav.map((n) => (
-            <Link key={n.to} to={n.to} className="text-sm font-medium text-muted-foreground hover:text-primary" activeProps={{ className: "text-primary" }} activeOptions={{ exact: true }}>
+            <Link key={n.to} to={n.to} className="whitespace-nowrap text-sm font-medium text-muted-foreground hover:text-primary" activeProps={{ className: "text-primary" }} activeOptions={{ exact: true }}>
               {n.label}
             </Link>
           ))}
         </nav>
-        <div className="hidden items-center gap-2 md:flex">
+        <div className={`hidden shrink-0 items-center gap-2 ${DESKTOP}:flex`}>
           <Link to="/connexion" className={btn.outline}>Se connecter</Link>
           <Link to="/inscription" className={btn.primary}>Créer un compte</Link>
         </div>
-        <button className="md:hidden text-primary" onClick={() => setOpen(!open)} aria-label="Menu">
+        <button className={`text-primary ${DESKTOP}:hidden`} onClick={() => setOpen(!open)} aria-label="Menu">
           {open ? <X /> : <Menu />}
         </button>
       </div>
       {open && (
-        <div className="border-t px-4 py-4 md:hidden">
+        <div className={`border-t px-4 py-4 ${DESKTOP}:hidden`}>
           <div className="flex flex-col gap-3">
             {nav.map((n) => (
-              <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="font-medium text-primary">{n.label}</Link>
+              <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="whitespace-nowrap font-medium text-primary">{n.label}</Link>
             ))}
             <Link to="/connexion" onClick={() => setOpen(false)} className={btn.outline}>Se connecter</Link>
             <Link to="/inscription" onClick={() => setOpen(false)} className={btn.primary}>Créer un compte</Link>

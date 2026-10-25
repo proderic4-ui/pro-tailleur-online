@@ -6,7 +6,7 @@ export const Route = createFileRoute("/tarifs")({
   head: () => ({
     meta: [
       { title: "Abonnements — Pro Tailleur Online" },
-      { name: "description", content: "Gratuit, Mensuel 2 000 FCFA ou Annuel 15 000 FCFA." },
+      { name: "description", content: "Gratuite 0 FCFA, Mensuelle 2 000 FCFA par mois ou Annuelle 15 000 FCFA par an." },
       { property: "og:title", content: "Abonnements — Pro Tailleur Online" },
       { property: "og:description", content: "Des tarifs simples pour les ateliers de couture." },
     ],
