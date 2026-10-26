@@ -1,6 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { Menu, X, Scissors } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuthSession } from "./AuthSession";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 
 const btnBase =
   "inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold transition-colors";
@@ -36,6 +41,22 @@ export function Logo() {
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { user, ready } = useAuthSession();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [signingOut, setSigningOut] = useState(false);
+  const [signoutError, setSignoutError] = useState("");
+  async function signOut() {
+    setSigningOut(true); setSignoutError("");
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    const { error } = await supabase.auth.signOut();
+    if (error) { setSignoutError("Déconnexion impossible. Réessayez."); setSigningOut(false); return; }
+    setOpen(false);
+    await navigate({ to: "/auth", replace: true });
+    setSigningOut(false);
+  }
+  const account = user ? <><Link to="/tableau-de-bord" onClick={() => setOpen(false)} className={btn.outline}>Mon atelier</Link><Button disabled={signingOut} onClick={signOut} className={`${btn.primary} h-auto`}>Déconnexion</Button></> : ready ? <><Link to="/connexion" onClick={() => setOpen(false)} className={btn.outline}>Se connecter</Link><Link to="/inscription" onClick={() => setOpen(false)} className={btn.primary}>Créer un compte</Link></> : null;
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl flex-nowrap items-center justify-between gap-4 px-4">
@@ -48,12 +69,11 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden shrink-0 items-center gap-2 min-[1100px]:flex">
-          <Link to="/connexion" className={btn.outline}>Se connecter</Link>
-          <Link to="/inscription" className={btn.primary}>Créer un compte</Link>
+          {account}
         </div>
-        <button className="text-primary min-[1100px]:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
+        <Button variant="ghost" size="icon" className="text-primary min-[1100px]:hidden" onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open}>
           {open ? <X /> : <Menu />}
-        </button>
+        </Button>
       </div>
       {open && (
         <div className="border-t px-4 py-4 min-[1100px]:hidden">
@@ -61,11 +81,11 @@ export function Header() {
             {nav.map((n) => (
               <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="whitespace-nowrap font-medium text-primary">{n.label}</Link>
             ))}
-            <Link to="/connexion" onClick={() => setOpen(false)} className={btn.outline}>Se connecter</Link>
-            <Link to="/inscription" onClick={() => setOpen(false)} className={btn.primary}>Créer un compte</Link>
+            {account}
           </div>
         </div>
       )}
+      {signoutError && <p role="alert" className="px-4 py-2 text-sm text-destructive">{signoutError}</p>}
     </header>
   );
 }

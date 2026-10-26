@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Use Cloud Auth email/password with one root session subscriber; protected workshop routes live under the client-only authenticated layout because sessions are browser-managed.
+- Fetch private workshop data through authenticated server functions and owner-scoped RLS; account creation and quotas are database triggers so direct requests cannot bypass them.
+- Subscription fields are service-managed and owner-read-only; never accept subscription upgrades or permissions from signup metadata.
