@@ -14,7 +14,159 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clients: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          workshop_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          workshop_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          workshop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_workshop_id_fkey"
+            columns: ["workshop_id"]
+            isOneToOne: false
+            referencedRelation: "workshops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          id: string
+          title: string
+          workshop_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          title: string
+          workshop_id: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          title?: string
+          workshop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_client_id_workshop_id_fkey"
+            columns: ["client_id", "workshop_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id", "workshop_id"]
+          },
+          {
+            foreignKeyName: "orders_workshop_id_fkey"
+            columns: ["workshop_id"]
+            isOneToOne: false
+            referencedRelation: "workshops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          phone: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id: string
+          phone: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          ends_at: string | null
+          plan: string
+          starts_at: string
+          status: string
+          workshop_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at?: string | null
+          plan?: string
+          starts_at?: string
+          status?: string
+          workshop_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string | null
+          plan?: string
+          starts_at?: string
+          status?: string
+          workshop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_workshop_id_fkey"
+            columns: ["workshop_id"]
+            isOneToOne: true
+            referencedRelation: "workshops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workshops: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workshops_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
