@@ -10,15 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as FonctionnalitesRouteImport } from './routes/fonctionnalites'
 import { Route as InscriptionRouteImport } from './routes/inscription'
-import { Route as TableauDeBordRouteImport } from './routes/tableau-de-bord'
 import { Route as TarifsRouteImport } from './routes/tarifs'
+import { Route as AuthenticatedTableauDeBordRouteImport } from './routes/_authenticated/tableau-de-bord'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConnexionRoute = ConnexionRouteImport.update({
@@ -36,75 +47,85 @@ const InscriptionRoute = InscriptionRouteImport.update({
   path: '/inscription',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TableauDeBordRoute = TableauDeBordRouteImport.update({
-  id: '/tableau-de-bord',
-  path: '/tableau-de-bord',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TarifsRoute = TarifsRouteImport.update({
   id: '/tarifs',
   path: '/tarifs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTableauDeBordRoute =
+  AuthenticatedTableauDeBordRouteImport.update({
+    id: '/tableau-de-bord',
+    path: '/tableau-de-bord',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/connexion': typeof ConnexionRoute
   '/fonctionnalites': typeof FonctionnalitesRoute
   '/inscription': typeof InscriptionRoute
-  '/tableau-de-bord': typeof TableauDeBordRoute
   '/tarifs': typeof TarifsRoute
+  '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/connexion': typeof ConnexionRoute
   '/fonctionnalites': typeof FonctionnalitesRoute
   '/inscription': typeof InscriptionRoute
-  '/tableau-de-bord': typeof TableauDeBordRoute
   '/tarifs': typeof TarifsRoute
+  '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/connexion': typeof ConnexionRoute
   '/fonctionnalites': typeof FonctionnalitesRoute
   '/inscription': typeof InscriptionRoute
-  '/tableau-de-bord': typeof TableauDeBordRoute
   '/tarifs': typeof TarifsRoute
+  '/_authenticated/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/connexion'
     | '/fonctionnalites'
     | '/inscription'
-    | '/tableau-de-bord'
     | '/tarifs'
+    | '/tableau-de-bord'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/connexion'
     | '/fonctionnalites'
     | '/inscription'
-    | '/tableau-de-bord'
     | '/tarifs'
+    | '/tableau-de-bord'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/connexion'
     | '/fonctionnalites'
     | '/inscription'
-    | '/tableau-de-bord'
     | '/tarifs'
+    | '/_authenticated/tableau-de-bord'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ConnexionRoute: typeof ConnexionRoute
   FonctionnalitesRoute: typeof FonctionnalitesRoute
   InscriptionRoute: typeof InscriptionRoute
-  TableauDeBordRoute: typeof TableauDeBordRoute
   TarifsRoute: typeof TarifsRoute
 }
 
@@ -115,6 +136,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/connexion': {
@@ -138,13 +173,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tableau-de-bord': {
-      id: '/tableau-de-bord'
-      path: '/tableau-de-bord'
-      fullPath: '/tableau-de-bord'
-      preLoaderRoute: typeof TableauDeBordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/tarifs': {
       id: '/tarifs'
       path: '/tarifs'
@@ -152,15 +180,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TarifsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tableau-de-bord': {
+      id: '/_authenticated/tableau-de-bord'
+      path: '/tableau-de-bord'
+      fullPath: '/tableau-de-bord'
+      preLoaderRoute: typeof AuthenticatedTableauDeBordRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedTableauDeBordRoute: typeof AuthenticatedTableauDeBordRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedTableauDeBordRoute: AuthenticatedTableauDeBordRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ConnexionRoute: ConnexionRoute,
   FonctionnalitesRoute: FonctionnalitesRoute,
   InscriptionRoute: InscriptionRoute,
-  TableauDeBordRoute: TableauDeBordRoute,
   TarifsRoute: TarifsRoute,
 }
 export const routeTree = rootRouteImport
