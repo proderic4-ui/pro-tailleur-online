@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as FonctionnalitesRouteImport } from './routes/fonctionnalites'
 import { Route as InscriptionRouteImport } from './routes/inscription'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as AuthenticatedTableauDeBordRouteImport } from './routes/_authenticated/tableau-de-bord'
 
@@ -47,6 +48,11 @@ const InscriptionRoute = InscriptionRouteImport.update({
   path: '/inscription',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TarifsRoute = TarifsRouteImport.update({
   id: '/tarifs',
   path: '/tarifs',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/connexion': typeof ConnexionRoute
   '/fonctionnalites': typeof FonctionnalitesRoute
   '/inscription': typeof InscriptionRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/tarifs': typeof TarifsRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
 }
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/connexion': typeof ConnexionRoute
   '/fonctionnalites': typeof FonctionnalitesRoute
   '/inscription': typeof InscriptionRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/tarifs': typeof TarifsRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
 }
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/connexion': typeof ConnexionRoute
   '/fonctionnalites': typeof FonctionnalitesRoute
   '/inscription': typeof InscriptionRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/tarifs': typeof TarifsRoute
   '/_authenticated/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
 }
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/connexion'
     | '/fonctionnalites'
     | '/inscription'
+    | '/reset-password'
     | '/tarifs'
     | '/tableau-de-bord'
   fileRoutesByTo: FileRoutesByTo
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/connexion'
     | '/fonctionnalites'
     | '/inscription'
+    | '/reset-password'
     | '/tarifs'
     | '/tableau-de-bord'
   id:
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/connexion'
     | '/fonctionnalites'
     | '/inscription'
+    | '/reset-password'
     | '/tarifs'
     | '/_authenticated/tableau-de-bord'
   fileRoutesById: FileRoutesById
@@ -126,6 +138,7 @@ export interface RootRouteChildren {
   ConnexionRoute: typeof ConnexionRoute
   FonctionnalitesRoute: typeof FonctionnalitesRoute
   InscriptionRoute: typeof InscriptionRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TarifsRoute: typeof TarifsRoute
 }
 
@@ -173,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tarifs': {
       id: '/tarifs'
       path: '/tarifs'
@@ -208,6 +228,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConnexionRoute: ConnexionRoute,
   FonctionnalitesRoute: FonctionnalitesRoute,
   InscriptionRoute: InscriptionRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   TarifsRoute: TarifsRoute,
 }
 export const routeTree = rootRouteImport
