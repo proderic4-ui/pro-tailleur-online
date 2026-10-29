@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793009809062,
+      "tag": "0000_tailor_accounts_private_workshops",
+      "breakpoints": true
+    }
+  ]
+}

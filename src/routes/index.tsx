@@ -10,6 +10,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "La plateforme de gestion pour tailleurs et couturiers africains : clients, mesures, commandes, paiements." },
       { property: "og:title", content: "Pro Tailleur Online" },
       { property: "og:description", content: "Gérez votre atelier de couture simplement, depuis votre téléphone." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
