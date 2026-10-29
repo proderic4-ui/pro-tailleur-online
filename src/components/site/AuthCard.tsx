@@ -23,7 +23,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setNotice("");
     const values = Object.fromEntries(new FormData(event.currentTarget));
-    const email = emailSchema.safeParse(values.email);
+    const email = emailSchema.safeParse(values['email']);
     if (!email.success) { setError(email.error.issues[0]?.message ?? "Adresse e-mail invalide."); return; }
     setBusy(true);
     try {
@@ -40,7 +40,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
         if (result.data.session) await navigate({ to: "/tableau-de-bord" });
         else setConfirmationEmail(email.data);
       } else {
-        const password = typeof values.password === "string" ? values.password : "";
+        const password = typeof values['password'] === "string" ? values['password'] : "";
         if (!password || password.length > 128) { setError("Saisissez votre mot de passe."); return; }
         const result = await supabase.auth.signInWithPassword({ email: email.data, password });
         if (result.error) throw result.error;
@@ -68,11 +68,11 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
             {signup && <>
               <label className="block text-sm font-medium">Nom complet du tailleur<input name="full_name" autoComplete="name" required maxLength={100} className={field} /></label>
               <label className="block text-sm font-medium">Nom de l’atelier<input name="workshop_name" autoComplete="organization" required maxLength={120} className={field} /></label>
-              <label className="block text-sm font-medium">Numéro de téléphone<input name="phone" type="tel" autoComplete="tel" required defaultValue="+228" maxLength={20} className={field} /><span className="mt-1 block text-xs text-muted-foreground">+228 suivi de 8 chiffres</span></label>
+              <label className="block text-sm font-medium">Numéro de téléphone<input name="phone" aria-label="Numéro de téléphone" type="tel" autoComplete="tel" required defaultValue="+228" maxLength={20} className={field} /><span className="mt-1 block text-xs text-muted-foreground">+228 suivi de 8 chiffres</span></label>
             </>}
             <label className="block text-sm font-medium">Adresse e-mail<input name="email" type="email" autoComplete="email" required maxLength={255} className={field} /></label>
             {!forgot && <>
-              <label className="block text-sm font-medium">Mot de passe<div className="relative"><input name="password" type={visible ? "text" : "password"} autoComplete={signup ? "new-password" : "current-password"} required minLength={signup ? 8 : 1} maxLength={128} className={`${field} pr-12`} /><Button type="button" variant="ghost" size="icon" className="absolute right-2 top-2" aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"} title={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"} onClick={() => setVisible(!visible)}>{visible ? <EyeOff /> : <Eye />}</Button></div>{signup && <span className="mt-1 block text-xs text-muted-foreground">8 caractères minimum</span>}</label>
+              <label className="block text-sm font-medium">Mot de passe<div className="relative"><input name="password" aria-label="Mot de passe" type={visible ? "text" : "password"} autoComplete={signup ? "new-password" : "current-password"} required minLength={signup ? 8 : 1} maxLength={128} className={`${field} pr-12`} /><Button type="button" variant="ghost" size="icon" className="absolute right-2 top-2" aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"} title={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"} onClick={() => setVisible(!visible)}>{visible ? <EyeOff /> : <Eye />}</Button></div>{signup && <span className="mt-1 block text-xs text-muted-foreground">8 caractères minimum</span>}</label>
               {signup && <label className="block text-sm font-medium">Confirmation du mot de passe<input name="confirmation" type={visible ? "text" : "password"} autoComplete="new-password" required maxLength={128} className={field} /></label>}
             </>}
             <Button disabled={busy} className={`${btn.primary} w-full h-auto`}>{busy ? "Veuillez patienter…" : forgot ? "Envoyer le lien" : signup ? "Créer mon compte" : "Connexion"}</Button>
