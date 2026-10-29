@@ -8,6 +8,8 @@ export const Route = createFileRoute("/connexion")({
       { name: "description", content: "Connectez-vous à votre atelier Pro Tailleur Online." },
       { property: "og:title", content: "Se connecter — Pro Tailleur Online" },
       { property: "og:description", content: "Accédez à votre atelier." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: () => <AuthCard mode="login" />,

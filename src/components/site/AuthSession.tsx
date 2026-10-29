@@ -22,6 +22,7 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
     };
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
+        sessionStorage.setItem("tailor-recovery", "true");
         setUser(session?.user ?? null);
         setReady(true);
         void router.navigate({ to: "/reset-password", replace: true });

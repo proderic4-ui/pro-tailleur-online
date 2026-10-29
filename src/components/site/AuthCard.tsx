@@ -23,7 +23,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setNotice("");
     const values = Object.fromEntries(new FormData(event.currentTarget));
-    const email = emailSchema.safeParse(values.email);
+    const email = emailSchema.safeParse(values['email']);
     if (!email.success) { setError(email.error.issues[0]?.message ?? "Adresse e-mail invalide."); return; }
     setBusy(true);
     try {
@@ -40,7 +40,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
         if (result.data.session) await navigate({ to: "/tableau-de-bord" });
         else setConfirmationEmail(email.data);
       } else {
-        const password = typeof values.password === "string" ? values.password : "";
+        const password = typeof values['password'] === "string" ? values['password'] : "";
         if (!password || password.length > 128) { setError("Saisissez votre mot de passe."); return; }
         const result = await supabase.auth.signInWithPassword({ email: email.data, password });
         if (result.error) throw result.error;
