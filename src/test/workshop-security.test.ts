@@ -9,7 +9,7 @@ const secret = process.env['SUPABASE_SERVICE_ROLE_KEY'];
 describe.skipIf(!url || !key || !secret)("Cloud atelier isolation et limites", () => {
   it("provisionne gratuitement, isole deux ateliers et refuse le 6e client et la 4e commande", async () => {
     if (!url || !key || !secret) throw new Error("Cloud test environment required");
-    const options = (apiKey: string) => ({ auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: (input: RequestInfo | URL, init?: RequestInit) => {
+    const options = (apiKey: string) => ({ auth: { storageKey: `test-${randomUUID()}`, persistSession: false, autoRefreshToken: false }, global: { fetch: (input: RequestInfo | URL, init?: RequestInit) => {
       const headers = new Headers(init?.headers);
       if (headers.get("Authorization") === `Bearer ${apiKey}`) headers.delete("Authorization");
       headers.set("apikey", apiKey);
@@ -43,7 +43,8 @@ describe.skipIf(!url || !key || !secret)("Cloud atelier isolation et limites", (
       expect((await b.client.from("workshops").select("id").eq("id", a.workshop.id)).data).toEqual([]);
       expect((await b.client.from("workshops").update({ name: "Interdit" }).eq("id", a.workshop.id).select()).data).toEqual([]);
       expect((await b.client.from("clients").insert({ workshop_id: a.workshop.id, full_name: "Interdit" })).error).not.toBeNull();
-      expect((await a.client.from("subscriptions").update({ plan: "annual" }).eq("workshop_id", a.workshop.id)).error).not.toBeNull();
+      await a.client.from("subscriptions").update({ plan: "annual" }).eq("workshop_id", a.workshop.id);
+      expect((await a.client.from("subscriptions").select("plan").single()).data?.plan).toBe("free");
       for (let index = 0; index < 5; index++) expect((await a.client.from("clients").insert({ workshop_id: a.workshop.id, full_name: `Client test ${index}` })).error).toBeNull();
       expect((await a.client.from("clients").insert({ workshop_id: a.workshop.id, full_name: "Sixième client" })).error?.message).toContain("5 maximum");
       for (let index = 0; index < 3; index++) expect((await a.client.from("orders").insert({ workshop_id: a.workshop.id, title: `Commande test ${index}` })).error).toBeNull();
