@@ -8,6 +8,6 @@
 - [ ] Vérifier réception et ouverture du mail de récupération, puis modification du mot de passe. Bloqué : accès à la boîte mail du destinataire.
 
 # Module clients
-- [ ] Ajouter téléphone, adresse et notes avec validation et isolation.
-- [ ] Ajouter navigation connectée, liste recherchable, ajout, fiche et modification.
-- [ ] Vérifier le parcours connecté, la limite gratuite et la sécurité entre ateliers.
+- [x] Ajouter téléphone, adresse et notes avec validation et isolation.
+- [x] Ajouter navigation connectée, liste recherchable, ajout, fiche et modification.
+- [x] Vérifier le parcours connecté, la limite gratuite et la sécurité entre ateliers.
