@@ -12,7 +12,7 @@ type ExistingClient = ClientInput & { id: string };
 export function ClientForm({ open, onOpenChange, client, onSaved }: { open: boolean; onOpenChange: (open: boolean) => void; client?: ExistingClient; onSaved: (id: string) => void }) {
   return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-lg" aria-describedby={undefined}><DialogHeader><DialogTitle className="text-2xl tracking-normal text-primary">{client ? "Modifier le client" : "Nouveau client"}</DialogTitle></DialogHeader><Form key={client?.id ?? "new"} client={client} onCancel={() => onOpenChange(false)} onSaved={onSaved} /></DialogContent></Dialog>;
 }
-function Form({ client, onCancel, onSaved }: { client?: ExistingClient; onCancel: () => void; onSaved: (id: string) => void }) {
+function Form({ client, onCancel, onSaved }: { client?: ExistingClient | undefined; onCancel: () => void; onSaved: (id: string) => void }) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const create = useServerFn(createClient);

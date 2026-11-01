@@ -12,7 +12,7 @@ import { clientsQuery } from "@/lib/clients.queries";
 import { FREE_CLIENT_MESSAGE, matchesClient } from "@/lib/client-validation";
 
 export const Route = createFileRoute("/_authenticated/clients/")({
-  validateSearch: (search) => ({ q: z.string().max(100).catch("").parse(search.q ?? "") }),
+  validateSearch: (search) => ({ q: z.string().max(100).catch("").parse(search['q'] ?? "") }),
   loader: ({ context }) => context.queryClient.ensureQueryData(clientsQuery),
   head: () => ({ meta: [
     { title: "Mes clients — Pro Tailleur Online" },

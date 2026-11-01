@@ -33,7 +33,7 @@ function ClientDetail() {
   const [saved, setSaved] = useState(false);
   if (!client) return <ClientNotFound />;
   return <PageShell><section className="mx-auto max-w-5xl px-4 py-10 md:py-12">
-    <Link to="/clients" className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />Retour aux clients</Link>
+    <Link to="/clients" search={{ q: "" }} className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />Retour aux clients</Link>
     <div className="flex flex-wrap items-start justify-between gap-4"><h1 className="min-w-0 break-words text-3xl text-primary md:text-4xl">{client.full_name}</h1><Button variant="outline" className="shrink-0 rounded-full" onClick={() => { setSaved(false); setOpen(true); }}><Pencil className="h-4 w-4" />Modifier</Button></div>
     {saved && <p role="status" className="mt-4 text-sm text-success">Les informations du client ont été mises à jour.</p>}
     <dl className="mt-8 grid gap-x-8 gap-y-6 border-y py-8 sm:grid-cols-2">
