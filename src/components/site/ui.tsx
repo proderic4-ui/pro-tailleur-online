@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { Menu, X, Scissors } from "lucide-react";
+import { Menu, X, Scissors, LayoutDashboard, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthSession } from "./AuthSession";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,6 +85,7 @@ export function Header() {
           </div>
         </div>
       )}
+      {user && <nav aria-label="Mon atelier" className="border-t bg-background"><div className="mx-auto flex max-w-6xl items-center gap-6 px-4"><Link to="/tableau-de-bord" className="inline-flex items-center gap-2 whitespace-nowrap border-b-2 border-transparent py-3 text-sm font-medium text-muted-foreground" activeProps={{ className: "border-gold text-primary" }}><LayoutDashboard className="h-4 w-4" />Tableau de bord</Link><Link to="/clients" className="inline-flex items-center gap-2 whitespace-nowrap border-b-2 border-transparent py-3 text-sm font-medium text-muted-foreground" activeProps={{ className: "border-gold text-primary" }}><Users className="h-4 w-4" />Clients</Link></div></nav>}
       {signoutError && <p role="alert" className="px-4 py-2 text-sm text-destructive">{signoutError}</p>}
     </header>
   );

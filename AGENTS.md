@@ -12,3 +12,4 @@
 - Use Cloud Auth email/password with one root session subscriber; protected workshop routes live under the client-only authenticated layout because sessions are browser-managed.
 - Fetch private workshop data through authenticated server functions and owner-scoped RLS; account creation and quotas are database triggers so direct requests cannot bypass them.
 - Subscription fields are service-managed and owner-read-only; never accept subscription upgrades or permissions from signup metadata.
+- Client routes use authenticated server functions and Query-backed loaders; shared Zod validation and database contact validation protect both forms and direct requests, while existing owner RLS and quota triggers remain authoritative.
