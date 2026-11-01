@@ -18,6 +18,8 @@ import { Route as InscriptionRouteImport } from './routes/inscription'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as AuthenticatedTableauDeBordRouteImport } from './routes/_authenticated/tableau-de-bord'
+import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients.index'
+import { Route as AuthenticatedClientsClientIdRouteImport } from './routes/_authenticated/clients.$clientId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +66,18 @@ const AuthenticatedTableauDeBordRoute =
     path: '/tableau-de-bord',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedClientsIndexRoute =
+  AuthenticatedClientsIndexRouteImport.update({
+    id: '/clients/',
+    path: '/clients/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedClientsClientIdRoute =
+  AuthenticatedClientsClientIdRouteImport.update({
+    id: '/clients/$clientId',
+    path: '/clients/$clientId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -74,6 +88,8 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/tarifs': typeof TarifsRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
+  '/clients/$clientId': typeof AuthenticatedClientsClientIdRoute
+  '/clients/': typeof AuthenticatedClientsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -84,6 +100,8 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/tarifs': typeof TarifsRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
+  '/clients/$clientId': typeof AuthenticatedClientsClientIdRoute
+  '/clients': typeof AuthenticatedClientsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -96,6 +114,8 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/tarifs': typeof TarifsRoute
   '/_authenticated/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
+  '/_authenticated/clients/$clientId': typeof AuthenticatedClientsClientIdRoute
+  '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,6 +128,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/tarifs'
     | '/tableau-de-bord'
+    | '/clients/$clientId'
+    | '/clients/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -118,6 +140,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/tarifs'
     | '/tableau-de-bord'
+    | '/clients/$clientId'
+    | '/clients'
   id:
     | '__root__'
     | '/'
@@ -129,6 +153,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/tarifs'
     | '/_authenticated/tableau-de-bord'
+    | '/_authenticated/clients/$clientId'
+    | '/_authenticated/clients/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -207,15 +233,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTableauDeBordRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/clients/': {
+      id: '/_authenticated/clients/'
+      path: '/clients'
+      fullPath: '/clients/'
+      preLoaderRoute: typeof AuthenticatedClientsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/clients/$clientId': {
+      id: '/_authenticated/clients/$clientId'
+      path: '/clients/$clientId'
+      fullPath: '/clients/$clientId'
+      preLoaderRoute: typeof AuthenticatedClientsClientIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedTableauDeBordRoute: typeof AuthenticatedTableauDeBordRoute
+  AuthenticatedClientsClientIdRoute: typeof AuthenticatedClientsClientIdRoute
+  AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTableauDeBordRoute: AuthenticatedTableauDeBordRoute,
+  AuthenticatedClientsClientIdRoute: AuthenticatedClientsClientIdRoute,
+  AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
