@@ -8,6 +8,13 @@
       "when": 1793009809062,
       "tag": "0000_tailor_accounts_private_workshops",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793522250409,
+      "tag": "0001_client_contact_details",
+      "breakpoints": true
     }
   ]
 }

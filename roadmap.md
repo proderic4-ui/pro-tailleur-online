@@ -6,3 +6,8 @@
 - [x] Tester connexion réelle, isolation, limites et formulaires; aucun compte de test conservé.
 - [ ] Vérifier inscription via une adresse réelle, réception et ouverture du mail de confirmation. Bloqué : accès à la boîte mail du destinataire.
 - [ ] Vérifier réception et ouverture du mail de récupération, puis modification du mot de passe. Bloqué : accès à la boîte mail du destinataire.
+
+# Module clients
+- [x] Ajouter téléphone, adresse et notes avec validation et isolation.
+- [x] Ajouter navigation connectée, liste recherchable, ajout, fiche et modification.
+- [x] Vérifier le parcours connecté, la limite gratuite et la sécurité entre ateliers.
