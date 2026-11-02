@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      client_measurements: {
+        Row: {
+          client_id: string
+          garment_type: string
+          id: string
+          measurements: Json
+          taken_at: string
+          workshop_id: string
+        }
+        Insert: {
+          client_id: string
+          garment_type: string
+          id?: string
+          measurements?: Json
+          taken_at?: string
+          workshop_id: string
+        }
+        Update: {
+          client_id?: string
+          garment_type?: string
+          id?: string
+          measurements?: Json
+          taken_at?: string
+          workshop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_measurements_client_id_workshop_id_fkey"
+            columns: ["client_id", "workshop_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id", "workshop_id"]
+          },
+          {
+            foreignKeyName: "client_measurements_workshop_id_fkey"
+            columns: ["workshop_id"]
+            isOneToOne: false
+            referencedRelation: "workshops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           address: string
@@ -52,26 +94,103 @@ export type Database = {
           },
         ]
       }
-      orders: {
+      garment_categories: {
         Row: {
-          client_id: string | null
           created_at: string
           id: string
-          title: string
+          measurement_labels: string[]
+          name: string
           workshop_id: string
         }
         Insert: {
-          client_id?: string | null
           created_at?: string
           id?: string
-          title: string
+          measurement_labels?: string[]
+          name: string
           workshop_id: string
         }
         Update: {
-          client_id?: string | null
           created_at?: string
           id?: string
+          measurement_labels?: string[]
+          name?: string
+          workshop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "garment_categories_workshop_id_fkey"
+            columns: ["workshop_id"]
+            isOneToOne: false
+            referencedRelation: "workshops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          balance: number | null
+          client_id: string | null
+          colors: string
+          created_at: string
+          delivery_date: string | null
+          deposit: number
+          description: string
+          fabric_photo_path: string | null
+          finishes: string
+          garment_type: string
+          id: string
+          measurements: Json
+          model_photo_path: string | null
+          notes: string
+          order_number: number | null
+          status: string
+          title: string
+          total_price: number
+          updated_at: string
+          workshop_id: string
+        }
+        Insert: {
+          balance?: number | null
+          client_id?: string | null
+          colors?: string
+          created_at?: string
+          delivery_date?: string | null
+          deposit?: number
+          description?: string
+          fabric_photo_path?: string | null
+          finishes?: string
+          garment_type?: string
+          id?: string
+          measurements?: Json
+          model_photo_path?: string | null
+          notes?: string
+          order_number?: number | null
+          status?: string
+          title: string
+          total_price?: number
+          updated_at?: string
+          workshop_id: string
+        }
+        Update: {
+          balance?: number | null
+          client_id?: string | null
+          colors?: string
+          created_at?: string
+          delivery_date?: string | null
+          deposit?: number
+          description?: string
+          fabric_photo_path?: string | null
+          finishes?: string
+          garment_type?: string
+          id?: string
+          measurements?: Json
+          model_photo_path?: string | null
+          notes?: string
+          order_number?: number | null
+          status?: string
           title?: string
+          total_price?: number
+          updated_at?: string
           workshop_id?: string
         }
         Relationships: [
