@@ -21,6 +21,8 @@ import { Route as AuthenticatedTableauDeBordRouteImport } from './routes/_authen
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients.index'
 import { Route as AuthenticatedClientsClientIdRouteImport } from './routes/_authenticated/clients.$clientId'
 import { Route as AuthenticatedCommandesIndexRouteImport } from './routes/_authenticated/commandes.index'
+import { Route as AuthenticatedCommandesOrderIdRouteImport } from './routes/_authenticated/commandes.$orderId'
+import { Route as AuthenticatedCommandesNouvelleRouteImport } from './routes/_authenticated/commandes.nouvelle'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -85,6 +87,18 @@ const AuthenticatedCommandesIndexRoute =
     path: '/commandes/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCommandesOrderIdRoute =
+  AuthenticatedCommandesOrderIdRouteImport.update({
+    id: '/commandes/$orderId',
+    path: '/commandes/$orderId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCommandesNouvelleRoute =
+  AuthenticatedCommandesNouvelleRouteImport.update({
+    id: '/commandes/nouvelle',
+    path: '/commandes/nouvelle',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +110,8 @@ export interface FileRoutesByFullPath {
   '/tarifs': typeof TarifsRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
   '/clients/$clientId': typeof AuthenticatedClientsClientIdRoute
+  '/commandes/$orderId': typeof AuthenticatedCommandesOrderIdRoute
+  '/commandes/nouvelle': typeof AuthenticatedCommandesNouvelleRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/commandes/': typeof AuthenticatedCommandesIndexRoute
 }
@@ -109,6 +125,8 @@ export interface FileRoutesByTo {
   '/tarifs': typeof TarifsRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
   '/clients/$clientId': typeof AuthenticatedClientsClientIdRoute
+  '/commandes/$orderId': typeof AuthenticatedCommandesOrderIdRoute
+  '/commandes/nouvelle': typeof AuthenticatedCommandesNouvelleRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/commandes': typeof AuthenticatedCommandesIndexRoute
 }
@@ -124,6 +142,8 @@ export interface FileRoutesById {
   '/tarifs': typeof TarifsRoute
   '/_authenticated/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
   '/_authenticated/clients/$clientId': typeof AuthenticatedClientsClientIdRoute
+  '/_authenticated/commandes/$orderId': typeof AuthenticatedCommandesOrderIdRoute
+  '/_authenticated/commandes/nouvelle': typeof AuthenticatedCommandesNouvelleRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/commandes/': typeof AuthenticatedCommandesIndexRoute
 }
@@ -139,6 +159,8 @@ export interface FileRouteTypes {
     | '/tarifs'
     | '/tableau-de-bord'
     | '/clients/$clientId'
+    | '/commandes/$orderId'
+    | '/commandes/nouvelle'
     | '/clients/'
     | '/commandes/'
   fileRoutesByTo: FileRoutesByTo
@@ -152,6 +174,8 @@ export interface FileRouteTypes {
     | '/tarifs'
     | '/tableau-de-bord'
     | '/clients/$clientId'
+    | '/commandes/$orderId'
+    | '/commandes/nouvelle'
     | '/clients'
     | '/commandes'
   id:
@@ -166,6 +190,8 @@ export interface FileRouteTypes {
     | '/tarifs'
     | '/_authenticated/tableau-de-bord'
     | '/_authenticated/clients/$clientId'
+    | '/_authenticated/commandes/$orderId'
+    | '/_authenticated/commandes/nouvelle'
     | '/_authenticated/clients/'
     | '/_authenticated/commandes/'
   fileRoutesById: FileRoutesById
@@ -267,12 +293,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommandesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/commandes/$orderId': {
+      id: '/_authenticated/commandes/$orderId'
+      path: '/commandes/$orderId'
+      fullPath: '/commandes/$orderId'
+      preLoaderRoute: typeof AuthenticatedCommandesOrderIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/commandes/nouvelle': {
+      id: '/_authenticated/commandes/nouvelle'
+      path: '/commandes/nouvelle'
+      fullPath: '/commandes/nouvelle'
+      preLoaderRoute: typeof AuthenticatedCommandesNouvelleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedTableauDeBordRoute: typeof AuthenticatedTableauDeBordRoute
   AuthenticatedClientsClientIdRoute: typeof AuthenticatedClientsClientIdRoute
+  AuthenticatedCommandesOrderIdRoute: typeof AuthenticatedCommandesOrderIdRoute
+  AuthenticatedCommandesNouvelleRoute: typeof AuthenticatedCommandesNouvelleRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedCommandesIndexRoute: typeof AuthenticatedCommandesIndexRoute
 }
@@ -280,6 +322,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTableauDeBordRoute: AuthenticatedTableauDeBordRoute,
   AuthenticatedClientsClientIdRoute: AuthenticatedClientsClientIdRoute,
+  AuthenticatedCommandesOrderIdRoute: AuthenticatedCommandesOrderIdRoute,
+  AuthenticatedCommandesNouvelleRoute: AuthenticatedCommandesNouvelleRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedCommandesIndexRoute: AuthenticatedCommandesIndexRoute,
 }
