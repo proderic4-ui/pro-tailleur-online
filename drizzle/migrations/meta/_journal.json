@@ -15,6 +15,13 @@
       "when": 1793522250409,
       "tag": "0001_client_contact_details",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793617298498,
+      "tag": "0002_orders_measurements_free_limit_10",
+      "breakpoints": true
     }
   ]
 }
