@@ -7,7 +7,7 @@ const key = process.env['SUPABASE_PUBLISHABLE_KEY'];
 const secret = process.env['SUPABASE_SERVICE_ROLE_KEY'];
 
 describe.skipIf(!url || !key || !secret)("Cloud atelier isolation et limites", () => {
-  it("provisionne gratuitement, isole deux ateliers et refuse le 6e client et la 4e commande", async () => {
+  it("provisionne gratuitement, isole deux ateliers et refuse le 11e client et la 4e commande", async () => {
     if (!url || !key || !secret) throw new Error("Cloud test environment required");
     const options = (apiKey: string) => ({ auth: { storageKey: `test-${randomUUID()}`, persistSession: false, autoRefreshToken: false }, global: { fetch: (input: RequestInfo | URL, init?: RequestInit) => {
       const headers = new Headers(init?.headers);
