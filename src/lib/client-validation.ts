@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const FREE_CLIENT_MESSAGE = "Vous avez atteint la limite de 5 clients de la formule gratuite. Passez à l'abonnement Mensuel (2 000 FCFA) ou Annuel (15 000 FCFA) pour enregistrer des clients illimités.";
+export const FREE_CLIENT_MESSAGE = "Vous avez atteint la limite de 10 clients de la formule gratuite. Passez à l'abonnement Mensuel (2 000 FCFA) ou Annuel (15 000 FCFA) pour enregistrer des clients illimités.";
 export const clientSchema = z.object({
   full_name: z.string().trim().min(1, "Le nom complet est obligatoire.").max(100, "Le nom est limité à 100 caractères."),
   phone: z.string().trim().min(1, "Le numéro de téléphone est obligatoire.").max(30).regex(/^\+?[0-9 ()-]+$/, "Saisissez un numéro de téléphone valide.").refine((value) => { const digits = value.replace(/\D/g, ""); return digits.length >= 8 && digits.length <= 15; }, "Le téléphone doit contenir entre 8 et 15 chiffres."),

@@ -8,12 +8,15 @@ import { Button } from "@/components/ui/button";
 import { ClientForm } from "@/components/site/ClientForm";
 import { ClientsError, ClientNotFound } from "@/components/site/ClientsError";
 import { clientQuery } from "@/lib/clients.queries";
+import { clientHistoryQuery } from "@/lib/orders.queries";
+import { fcfa, statusLabel } from "@/lib/garments";
 
 export const Route = createFileRoute("/_authenticated/clients/$clientId")({
   loader: async ({ params, context }) => {
     if (!z.string().uuid().safeParse(params.clientId).success) throw notFound();
     const client = await context.queryClient.ensureQueryData(clientQuery(params.clientId));
     if (!client) throw notFound();
+    await context.queryClient.ensureQueryData(clientHistoryQuery(params.clientId));
   },
   head: () => ({ meta: [
     { title: "Fiche client — Pro Tailleur Online" },
@@ -29,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/clients/$clientId")({
 function ClientDetail() {
   const { clientId } = Route.useParams();
   const { data: client } = useSuspenseQuery(clientQuery(clientId));
+  const { data: history } = useSuspenseQuery(clientHistoryQuery(clientId));
   const [open, setOpen] = useState(false);
   const [saved, setSaved] = useState(false);
   if (!client) return <ClientNotFound />;
@@ -42,7 +46,8 @@ function ClientDetail() {
       <div><dt className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-4 w-4 text-gold" />Adresse</dt><dd className="mt-2 whitespace-pre-wrap break-words text-primary">{client.address || "Non renseignée"}</dd></div>
       <div><dt className="flex items-center gap-2 text-sm text-muted-foreground"><FileText className="h-4 w-4 text-gold" />Notes particulières</dt><dd className="mt-2 whitespace-pre-wrap break-words text-primary">{client.notes || "Aucune note"}</dd></div>
     </dl>
-    <section className="border-b py-8"><h2 className="text-2xl text-primary">Historique des commandes</h2><div className="min-h-16" /></section>
+    <section className="border-b py-8"><h2 className="text-2xl text-primary">Historique des commandes</h2>{history.orders.length ? <ul className="mt-4 divide-y">{history.orders.map((o) => <li key={o.id}><Link to="/commandes/$orderId" params={{ orderId: o.id }} className="block py-3 hover:bg-muted/60"><span className="font-semibold text-primary">N° {o.order_number} · {o.garment_type}</span><span className="block text-sm text-muted-foreground">{statusLabel(o.status)} · Solde {fcfa(o.balance ?? 0)}</span></Link></li>)}</ul> : <p className="mt-2 text-sm text-muted-foreground">Aucune commande.</p>}</section>
+    <section className="border-b py-8"><h2 className="text-2xl text-primary">Historique des mesures</h2>{history.measurements.length ? <ul className="mt-4 space-y-4">{history.measurements.map((m) => <li key={m.id}><p className="text-sm font-semibold text-primary">{new Date(m.taken_at).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })} · {m.garment_type}</p><p className="text-sm text-muted-foreground">{(m.measurements as { label: string; value: number }[]).map((x) => `${x.label} : ${x.value} cm`).join(" · ")}</p></li>)}</ul> : <p className="mt-2 text-sm text-muted-foreground">Aucune mesure enregistrée.</p>}</section>
     <section className="py-8"><h2 className="text-2xl text-primary">Historique des paiements</h2><div className="min-h-16" /></section>
     <ClientForm open={open} onOpenChange={setOpen} client={{ ...client, phone: client.phone ?? "" }} onSaved={() => { setOpen(false); setSaved(true); }} />
   </section></PageShell>;

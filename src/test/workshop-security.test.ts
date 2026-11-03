@@ -46,8 +46,8 @@ describe.skipIf(!url || !key || !secret)("Cloud atelier isolation et limites", (
       await a.client.from("subscriptions").update({ plan: "annual" }).eq("workshop_id", a.workshop.id);
       expect((await a.client.from("subscriptions").select("plan").single()).data?.plan).toBe("free");
       expect((await a.client.from("clients").insert({ workshop_id: a.workshop.id, full_name: "Sans téléphone" })).error).not.toBeNull();
-      for (let index = 0; index < 5; index++) expect((await a.client.from("clients").insert({ workshop_id: a.workshop.id, full_name: `Client test ${index}`, phone: "+22890123456", address: "Lomé", notes: "Préférence tissu wax" })).error).toBeNull();
-      expect((await a.client.from("clients").insert({ workshop_id: a.workshop.id, full_name: "Sixième client", phone: "+22890123456" })).error?.message).toContain("5 maximum");
+      for (let index = 0; index < 10; index++) expect((await a.client.from("clients").insert({ workshop_id: a.workshop.id, full_name: `Client test ${index}`, phone: "+22890123456", address: "Lomé", notes: "Préférence tissu wax" })).error).toBeNull();
+      expect((await a.client.from("clients").insert({ workshop_id: a.workshop.id, full_name: "Onzième client", phone: "+22890123456" })).error?.message).toContain("10 maximum");
       const ownClient = await a.client.from("clients").select("*").limit(1).single();
       if (!ownClient.data) throw new Error("Client missing");
       expect(ownClient.data.address).toBe("Lomé");
