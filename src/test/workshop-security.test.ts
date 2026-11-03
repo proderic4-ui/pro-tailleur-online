@@ -69,10 +69,10 @@ describe.skipIf(!url || !key || !secret)("Cloud atelier isolation et limites", (
       expect((await b.client.from("orders").select("id")).data).toEqual([]);
       expect((await b.client.from("client_measurements").select("id")).data).toEqual([]);
       expect((await b.client.from("orders").update({ status: "cancelled" }).eq("workshop_id", a.workshop.id).select()).data).toEqual([]);
-      const photo = new Blob([new Uint8Array([137, 80, 78, 71])], { type: "image/png" });
+      const photo = new Uint8Array([137, 80, 78, 71]);
       const pathA = `${a.workshop.id}/${randomUUID()}.png`;
-      expect((await a.client.storage.from("order-photos").upload(pathA, photo)).error).toBeNull();
-      expect((await b.client.storage.from("order-photos").upload(`${a.workshop.id}/${randomUUID()}.png`, photo)).error).not.toBeNull();
+      expect((await a.client.storage.from("order-photos").upload(pathA, photo, { contentType: "image/png" })).error).toBeNull();
+      expect((await b.client.storage.from("order-photos").upload(`${a.workshop.id}/${randomUUID()}.png`, photo, { contentType: "image/png" })).error).not.toBeNull();
       expect((await b.client.storage.from("order-photos").download(pathA)).error).not.toBeNull();
       expect((await a.client.storage.from("order-photos").download(pathA)).error).toBeNull();
       await admin.storage.from("order-photos").remove([pathA]);
