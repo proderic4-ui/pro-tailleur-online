@@ -55,10 +55,27 @@ describe.skipIf(!url || !key || !secret)("Cloud atelier isolation et limites", (
       expect((await b.client.from("clients").select("*").eq("id", ownClient.data.id)).data).toEqual([]);
       expect((await b.client.from("clients").update({ full_name: "Intrusion" }).eq("id", ownClient.data.id).select()).data).toEqual([]);
       expect((await a.client.from("clients").update({ phone: "+22891123456" }).eq("id", ownClient.data.id).select().single()).data?.phone).toBe("+22891123456");
-      for (let index = 0; index < 3; index++) expect((await a.client.from("orders").insert({ workshop_id: a.workshop.id, title: `Commande test ${index}` })).error).toBeNull();
-      expect((await a.client.from("orders").insert({ workshop_id: a.workshop.id, title: "Quatrième commande" })).error?.message).toContain("3 maximum");
+      const order = { workshop_id: a.workshop.id, client_id: ownClient.data.id, garment_type: "Chemise", measurements: [{ label: "Poitrine", value: 100, unit: "cm" }], total_price: 20000, deposit: 5000, delivery_date: "2030-01-01" };
+      expect((await a.client.from("orders").insert({ ...order, title: "Sans client", client_id: null })).error).not.toBeNull();
+      expect((await a.client.from("orders").insert({ ...order, title: "Acompte trop grand", deposit: 30000 })).error).not.toBeNull();
+      const numbers: number[] = [];
+      for (let index = 0; index < 3; index++) { const r = await a.client.from("orders").insert({ ...order, title: `Commande test ${index}` }).select("order_number, balance").single(); expect(r.error).toBeNull(); expect(r.data?.balance).toBe(15000); numbers.push(r.data?.order_number ?? 0); }
+      expect(numbers).toEqual([1, 2, 3]);
+      expect((await a.client.from("orders").insert({ ...order, title: "Quatrième commande" })).error?.message).toContain("3 maximum");
+      // Measurement copy in the order stays unchanged when the client's history gets a new entry.
+      await a.client.from("client_measurements").insert({ workshop_id: a.workshop.id, client_id: ownClient.data.id, garment_type: "Chemise", measurements: [{ label: "Poitrine", value: 110, unit: "cm" }] });
+      expect((await a.client.from("orders").select("measurements").eq("order_number", 1).single()).data?.measurements).toEqual([{ label: "Poitrine", value: 100, unit: "cm" }]);
       expect((await b.client.from("clients").select("id")).data).toEqual([]);
       expect((await b.client.from("orders").select("id")).data).toEqual([]);
+      expect((await b.client.from("client_measurements").select("id")).data).toEqual([]);
+      expect((await b.client.from("orders").update({ status: "cancelled" }).eq("workshop_id", a.workshop.id).select()).data).toEqual([]);
+      const photo = new Blob([new Uint8Array([137, 80, 78, 71])], { type: "image/png" });
+      const pathA = `${a.workshop.id}/${randomUUID()}.png`;
+      expect((await a.client.storage.from("order-photos").upload(pathA, photo)).error).toBeNull();
+      expect((await b.client.storage.from("order-photos").upload(`${a.workshop.id}/${randomUUID()}.png`, photo)).error).not.toBeNull();
+      expect((await b.client.storage.from("order-photos").download(pathA)).error).not.toBeNull();
+      expect((await a.client.storage.from("order-photos").download(pathA)).error).toBeNull();
+      await admin.storage.from("order-photos").remove([pathA]);
     } finally {
       for (const id of ids) {
         const result = await admin.auth.admin.deleteUser(id);
