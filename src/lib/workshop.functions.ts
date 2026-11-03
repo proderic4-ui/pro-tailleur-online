@@ -15,5 +15,5 @@ export const getMyWorkshop = createServerFn({ method: "GET" })
     if (profile.error || subscription.error || clients.error || orders.error) throw new Error("Les informations de votre atelier n’ont pas pu être chargées.");
     const plan = subscription.data;
     const paid = plan && ["monthly", "annual"].includes(plan.plan) && plan.status === "active" && new Date(plan.starts_at) <= new Date() && plan.ends_at && new Date(plan.ends_at) > new Date();
-    return { workshop, profile: profile.data, subscription: plan, clients: clients.count ?? 0, orders: orders.count ?? 0, clientLimit: paid ? null : 5, orderLimit: paid ? null : 3 };
+    return { workshop, profile: profile.data, subscription: plan, clients: clients.count ?? 0, orders: orders.count ?? 0, clientLimit: paid ? null : 10, orderLimit: paid ? null : 3 };
   });

@@ -15,7 +15,7 @@ export const listClients = createServerFn({ method: "GET" }).middleware([require
   const plan = subscription.data;
   const now = Date.now();
   const paid = plan && ["monthly", "annual"].includes(plan.plan) && plan.status === "active" && Date.parse(plan.starts_at) <= now && plan.ends_at && Date.parse(plan.ends_at) > now;
-  return { clients: clients.data ?? [], workshop, limit: paid ? null : 5 };
+  return { clients: clients.data ?? [], workshop, limit: paid ? null : 10 };
 });
 export const getClient = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).inputValidator(z.object({ id: z.string().uuid() })).handler(async ({ data, context }) => {
   const result = await context.supabase.from("clients").select(fields).eq("id", data.id).maybeSingle();
@@ -26,7 +26,7 @@ export const createClient = createServerFn({ method: "POST" }).middleware([requi
   const workshop = await context.supabase.from("workshops").select("id").eq("owner_id", context.userId).single();
   if (workshop.error || !workshop.data) throw new Error("Votre atelier n’a pas pu être chargé.");
   const result = await context.supabase.from("clients").insert({ ...data, workshop_id: workshop.data.id }).select(fields).single();
-  if (result.error) return { client: null, error: result.error.message.includes("5 maximum") ? FREE_CLIENT_MESSAGE : "Le client n’a pas pu être enregistré. Réessayez." };
+  if (result.error) return { client: null, error: result.error.message.includes("10 maximum") ? FREE_CLIENT_MESSAGE : "Le client n’a pas pu être enregistré. Réessayez." };
   return { client: result.data, error: null };
 });
 export const updateClient = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(clientSchema.extend({ id: z.string().uuid() })).handler(async ({ data, context }) => {
