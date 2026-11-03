@@ -11,3 +11,6 @@
 - [x] Ajouter téléphone, adresse et notes avec validation et isolation.
 - [x] Ajouter navigation connectée, liste recherchable, ajout, fiche et modification.
 - [x] Vérifier le parcours connecté, la limite gratuite et la sécurité entre ateliers.
+# Commandes et limites
+- [x] Formule gratuite : 10 clients, 3 commandes (base de données + pages).
+- [x] Commandes, types de vêtements, modèles propres, mesures, photos privées, statuts et alertes de livraison.
