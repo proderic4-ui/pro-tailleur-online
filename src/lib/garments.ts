@@ -34,7 +34,7 @@ export const statusLabel = (value: string) => ORDER_STATUSES.find((s) => s.value
 
 export const measurementSchema = z.object({ label: z.string().trim().min(1).max(60), value: z.number().positive("Les mesures doivent être positives.").max(500, "Mesure trop grande."), unit: z.literal("cm") });
 const amount = z.number().int("Montant en FCFA entier.").min(0, "Le montant ne peut pas être négatif.").max(100_000_000);
-export const orderSchema = z.object({
+const orderFields = z.object({
   client_id: z.string().uuid("Choisissez un client."),
   garment_type: z.string().trim().min(1, "Choisissez un type de vêtement.").max(60),
   description: z.string().trim().max(2000),
@@ -47,7 +47,12 @@ export const orderSchema = z.object({
   notes: z.string().trim().max(2000),
   model_photo_path: z.string().max(200).nullable(),
   fabric_photo_path: z.string().max(200).nullable(),
-}).refine((o) => o.deposit <= o.total_price, { message: "L'acompte ne peut pas dépasser le prix total.", path: ["deposit"] });
+});
+const depositOk = (o: { deposit: number; total_price: number }) => o.deposit <= o.total_price;
+const depositMsg = () => ({ message: "L'acompte ne peut pas dépasser le prix total.", path: ["deposit"] });
+export const orderSchema = orderFields.refine(depositOk, depositMsg());
+/** Edit: client, number and creation date are never editable. */
+export const orderUpdateSchema = orderFields.omit({ client_id: true }).extend({ id: z.string().uuid() }).refine(depositOk, depositMsg());
 export type OrderInput = z.infer<typeof orderSchema>;
 
 export const balance = (total: number, deposit: number) => total - deposit;

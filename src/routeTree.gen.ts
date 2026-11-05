@@ -23,6 +23,7 @@ import { Route as AuthenticatedClientsClientIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedCommandesIndexRouteImport } from './routes/_authenticated/commandes.index'
 import { Route as AuthenticatedCommandesOrderIdRouteImport } from './routes/_authenticated/commandes.$orderId'
 import { Route as AuthenticatedCommandesNouvelleRouteImport } from './routes/_authenticated/commandes.nouvelle'
+import { Route as AuthenticatedCommandesOrderIdModifierRouteImport } from './routes/_authenticated/commandes.$orderId_.modifier'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -99,6 +100,12 @@ const AuthenticatedCommandesNouvelleRoute =
     path: '/commandes/nouvelle',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCommandesOrderIdModifierRoute =
+  AuthenticatedCommandesOrderIdModifierRouteImport.update({
+    id: '/commandes/$orderId_/modifier',
+    path: '/commandes/$orderId/modifier',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/commandes/nouvelle': typeof AuthenticatedCommandesNouvelleRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/commandes/': typeof AuthenticatedCommandesIndexRoute
+  '/commandes/$orderId/modifier': typeof AuthenticatedCommandesOrderIdModifierRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -129,6 +137,7 @@ export interface FileRoutesByTo {
   '/commandes/nouvelle': typeof AuthenticatedCommandesNouvelleRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/commandes': typeof AuthenticatedCommandesIndexRoute
+  '/commandes/$orderId/modifier': typeof AuthenticatedCommandesOrderIdModifierRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -146,6 +155,7 @@ export interface FileRoutesById {
   '/_authenticated/commandes/nouvelle': typeof AuthenticatedCommandesNouvelleRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/commandes/': typeof AuthenticatedCommandesIndexRoute
+  '/_authenticated/commandes/$orderId_/modifier': typeof AuthenticatedCommandesOrderIdModifierRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/commandes/nouvelle'
     | '/clients/'
     | '/commandes/'
+    | '/commandes/$orderId/modifier'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/commandes/nouvelle'
     | '/clients'
     | '/commandes'
+    | '/commandes/$orderId/modifier'
   id:
     | '__root__'
     | '/'
@@ -194,6 +206,7 @@ export interface FileRouteTypes {
     | '/_authenticated/commandes/nouvelle'
     | '/_authenticated/clients/'
     | '/_authenticated/commandes/'
+    | '/_authenticated/commandes/$orderId_/modifier'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommandesNouvelleRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/commandes/$orderId_/modifier': {
+      id: '/_authenticated/commandes/$orderId_/modifier'
+      path: '/commandes/$orderId/modifier'
+      fullPath: '/commandes/$orderId/modifier'
+      preLoaderRoute: typeof AuthenticatedCommandesOrderIdModifierRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -317,6 +337,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommandesNouvelleRoute: typeof AuthenticatedCommandesNouvelleRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedCommandesIndexRoute: typeof AuthenticatedCommandesIndexRoute
+  AuthenticatedCommandesOrderIdModifierRoute: typeof AuthenticatedCommandesOrderIdModifierRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -326,6 +347,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommandesNouvelleRoute: AuthenticatedCommandesNouvelleRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedCommandesIndexRoute: AuthenticatedCommandesIndexRoute,
+  AuthenticatedCommandesOrderIdModifierRoute:
+    AuthenticatedCommandesOrderIdModifierRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

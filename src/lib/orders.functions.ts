@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { FREE_ORDER_MESSAGE, orderSchema, statusValues } from "./garments";
+import { FREE_ORDER_MESSAGE, orderSchema, orderUpdateSchema, statusValues } from "./garments";
 
 type Ctx = { supabase: any; userId: string };
 async function myWorkshop(context: Ctx) {
@@ -51,6 +51,20 @@ export const createOrder = createServerFn({ method: "POST" }).middleware([requir
   // Dated measurement history; the order keeps its own frozen copy.
   if (data.measurements.length) await context.supabase.from("client_measurements").insert({ workshop_id: workshop.id, client_id: data.client_id, garment_type: data.garment_type, measurements: data.measurements });
   return { id: result.data.id as string, error: null };
+});
+
+export const updateOrder = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(orderUpdateSchema).handler(async ({ data, context }) => {
+  const workshop = await myWorkshop(context);
+  const { id, ...fields } = data;
+  for (const path of [fields.model_photo_path, fields.fabric_photo_path]) if (path && !path.startsWith(`${workshop.id}/`)) return { error: "Photo invalide." };
+  const before = await context.supabase.from("orders").select("client_id, measurements").eq("id", id).eq("workshop_id", workshop.id).maybeSingle();
+  if (before.error || !before.data) return { error: "Cette commande n’existe pas ou n’appartient pas à votre atelier." };
+  // Update only: client, number, creation date and balance are not sent (DB keeps/computes them).
+  const r = await context.supabase.from("orders").update({ ...fields, title: fields.garment_type }).eq("id", id).eq("workshop_id", workshop.id).select("id").maybeSingle();
+  if (r.error || !r.data) return { error: "La commande n’a pas pu être modifiée. Réessayez." };
+  if (fields.measurements.length && JSON.stringify(fields.measurements) !== JSON.stringify(before.data.measurements) && before.data.client_id)
+    await context.supabase.from("client_measurements").insert({ workshop_id: workshop.id, client_id: before.data.client_id, garment_type: fields.garment_type, measurements: fields.measurements });
+  return { error: null };
 });
 
 export const getOrder = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).inputValidator(z.object({ id: z.string().uuid() })).handler(async ({ data, context }) => {
