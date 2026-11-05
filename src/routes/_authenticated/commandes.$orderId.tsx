@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { ArrowLeft, AlertTriangle } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Pencil } from "lucide-react";
 import { z } from "zod";
 import { PageShell } from "@/components/site/ui";
 import { ClientsError } from "@/components/site/ClientsError";
@@ -49,7 +49,7 @@ function OrderDetail() {
   const Item = ({ k, v }: { k: string; v: string }) => <div><dt className="text-sm text-muted-foreground">{k}</dt><dd className="mt-1 whitespace-pre-wrap break-words text-primary">{v || "—"}</dd></div>;
   return <PageShell><section className="mx-auto max-w-3xl px-4 py-10">
     <Link to="/commandes" search={{ statut: "all" }} className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />Retour aux commandes</Link>
-    <h1 className="break-words text-3xl text-primary md:text-4xl">Commande N° {order.order_number} · {order.garment_type}</h1>
+    <div className="flex flex-wrap items-start justify-between gap-3"><h1 className="break-words text-3xl text-primary md:text-4xl">Commande N° {order.order_number} · {order.garment_type}</h1><Link to="/commandes/$orderId/modifier" params={{ orderId }} className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary"><Pencil className="h-4 w-4" />Modifier</Link></div>
     {client && <p className="mt-2 text-muted-foreground">Client : <Link to="/clients/$clientId" params={{ clientId: client.id }} className="text-primary underline">{client.full_name}</Link></p>}
     {alert && <p className={`mt-3 flex items-center gap-2 text-sm font-semibold ${alert === "late" ? "text-destructive" : "text-gold"}`}><AlertTriangle className="h-4 w-4" />{alert === "late" ? "Date de livraison dépassée" : "Livraison dans les 3 jours"}</p>}
     <label className="mt-6 block max-w-sm space-y-2 text-sm font-medium"><span>Statut</span><select aria-label="Statut" className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={order.status} onChange={(e) => changeStatus(e.target.value as OrderStatus)}>{ORDER_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}</select></label>
