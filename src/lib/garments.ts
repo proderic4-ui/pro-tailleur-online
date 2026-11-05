@@ -48,10 +48,11 @@ const orderFields = z.object({
   model_photo_path: z.string().max(200).nullable(),
   fabric_photo_path: z.string().max(200).nullable(),
 });
-const depositRule = [(o: { deposit: number; total_price: number }) => o.deposit <= o.total_price, { message: "L'acompte ne peut pas dépasser le prix total.", path: ["deposit"] }] as const;
-export const orderSchema = orderFields.refine(...depositRule);
+const depositOk = (o: { deposit: number; total_price: number }) => o.deposit <= o.total_price;
+const depositMsg = () => ({ message: "L'acompte ne peut pas dépasser le prix total.", path: ["deposit"] });
+export const orderSchema = orderFields.refine(depositOk, depositMsg());
 /** Edit: client, number and creation date are never editable. */
-export const orderUpdateSchema = orderFields.omit({ client_id: true }).extend({ id: z.string().uuid() }).refine(...depositRule);
+export const orderUpdateSchema = orderFields.omit({ client_id: true }).extend({ id: z.string().uuid() }).refine(depositOk, depositMsg());
 export type OrderInput = z.infer<typeof orderSchema>;
 
 export const balance = (total: number, deposit: number) => total - deposit;
