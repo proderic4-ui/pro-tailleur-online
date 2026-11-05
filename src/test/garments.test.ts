@@ -19,3 +19,12 @@ describe("commandes", () => {
     expect(deliveryAlert({ delivery_date: "2026-11-09", status: "delivered" }, today)).toBeNull();
   });
 });
+
+import { orderUpdateSchema } from "@/lib/garments";
+describe("modification de commande", () => {
+  const { client_id: _c, ...rest } = base;
+  const upd = { ...rest, id: "6f1b0f8e-2a4e-4c1e-9f1a-1b2c3d4e5f61" };
+  it("n'accepte pas de changement de client", () => { const r = orderUpdateSchema.safeParse({ ...upd, client_id: "6f1b0f8e-2a4e-4c1e-9f1a-1b2c3d4e5f62" }); expect(r.success && "client_id" in r.data).toBe(false); });
+  it("exige l'identifiant de la commande", () => expect(orderUpdateSchema.safeParse(rest).success).toBe(false));
+  it("refuse un acompte supérieur au prix", () => expect(orderUpdateSchema.safeParse({ ...upd, deposit: 25000 }).success).toBe(false));
+});

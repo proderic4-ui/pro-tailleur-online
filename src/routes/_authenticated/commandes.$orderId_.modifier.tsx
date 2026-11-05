@@ -55,7 +55,7 @@ function EditOrder() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const client = o.client as { full_name: string } | null;
-  const garmentOptions = types[garment] || garment in types ? Object.keys(types) : [garment, ...Object.keys(types)];
+  const garmentOptions = garment in types ? Object.keys(types) : [garment, ...Object.keys(types)];
 
   function chooseGarment(name: string) {
     setGarment(name);
