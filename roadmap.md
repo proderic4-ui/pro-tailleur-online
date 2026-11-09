@@ -14,3 +14,8 @@
 # Commandes et limites
 - [x] Formule gratuite : 10 clients, 3 commandes (base de données + pages).
 - [x] Commandes, types de vêtements, modèles propres, mesures, photos privées, statuts et alertes de livraison.
+
+# Indicateurs du tableau de bord
+- [x] Calculer les statistiques et livraisons privées selon Africa/Lome, sans changer les données.
+- [x] Afficher les montants manuels et listes liées aux fiches, adaptées aux téléphones.
+- [x] Tester les règles de calcul et vérifier le tableau connecté sans créer ni supprimer de données.

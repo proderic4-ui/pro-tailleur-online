@@ -15,3 +15,4 @@
 - Client routes use authenticated server functions and Query-backed loaders; shared Zod validation and database contact validation protect both forms and direct requests, while existing owner RLS and quota triggers remain authoritative.
 - Orders store a frozen JSON copy of measurements; dated measurement history lives separately per client so later edits never alter past orders. Order numbers and balances are assigned/computed by the database.
 - Order photos live in the private `order-photos` bucket under `<workshop_id>/...`; storage policies check that folder against the caller's workshop and pages show them through short-lived signed URLs.
+- Dashboard indicators use a pure date-aware calculator fed by workshop-scoped authenticated reads and a Query-backed loader; this keeps statistics testable without changing real orders and avoids browser-timezone differences.
