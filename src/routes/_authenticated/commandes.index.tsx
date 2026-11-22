@@ -6,7 +6,8 @@ import { PageShell } from "@/components/site/ui";
 import { Button } from "@/components/ui/button";
 import { ClientsError } from "@/components/site/ClientsError";
 import { ordersQuery } from "@/lib/orders.queries";
-import { FREE_ORDER_MESSAGE, ORDER_STATUSES, deliveryAlert, fcfa, statusLabel } from "@/lib/garments";
+import { ORDER_STATUSES, deliveryAlert, fcfa, isFreeOrderLimitReached, statusLabel } from "@/lib/garments";
+import { orderLimitMessage, readOnlyMessage } from "@/lib/plans";
 
 const filters = ["all", "alert", ...ORDER_STATUSES.map((s) => s.value)] as const;
 export const Route = createFileRoute("/_authenticated/commandes/")({
@@ -28,15 +29,17 @@ function Orders() {
   const { data } = useSuspenseQuery(ordersQuery);
   const { statut } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const atLimit = data.limit !== null && data.orders.length >= data.limit;
+  const readOnly = !data.planAccess.canManage;
+  const atLimit = isFreeOrderLimitReached(data.orders.length, data.limit);
+  const blocked = readOnly || atLimit;
   const alerts = data.orders.filter((o) => deliveryAlert(o));
   const orders = data.orders.filter((o) => statut === "all" ? true : statut === "alert" ? deliveryAlert(o) : o.status === statut);
   const chip = (value: (typeof filters)[number], label: string) => <button key={value} type="button" onClick={() => navigate({ search: { statut: value }, replace: true })} className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium ${statut === value ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary"}`}>{label}</button>;
   return <PageShell><section className="mx-auto max-w-5xl px-4 py-10 md:py-12">
     <p className="mb-2 break-words text-sm font-medium text-muted-foreground">{data.workshop.name}</p>
-    <div className="flex flex-wrap items-center justify-between gap-4"><div><h1 className="text-3xl text-primary md:text-4xl">Commandes</h1><p className="mt-2 text-sm text-muted-foreground">{data.orders.length} commande{data.orders.length !== 1 ? "s" : ""}{data.limit !== null ? ` · ${data.limit} maximum` : " · illimitées"}</p></div>
-      {atLimit ? <Button disabled className="rounded-full"><Plus className="h-4 w-4" />Nouvelle commande</Button> : <Button asChild className="rounded-full"><Link to="/commandes/nouvelle"><Plus className="h-4 w-4" />Nouvelle commande</Link></Button>}</div>
-    {atLimit && <div role="alert" className="mt-6 border-l-4 border-gold bg-gold-soft p-4 text-sm leading-relaxed text-primary"><p>{FREE_ORDER_MESSAGE}</p><Link to="/tarifs" className="mt-2 inline-block font-semibold underline">Voir les abonnements</Link></div>}
+    <div className="flex flex-wrap items-center justify-between gap-4"><div><h1 className="text-3xl text-primary md:text-4xl">Commandes</h1><p className="mt-2 text-sm text-muted-foreground">{data.orders.length} commande{data.orders.length !== 1 ? "s" : ""}{data.limit !== null ? ` · ${data.limit} maximum` : " · illimitées"}{readOnly ? " · lecture seule" : ""}</p></div>
+      {blocked ? <Button disabled className="rounded-full"><Plus className="h-4 w-4" />Nouvelle commande</Button> : <Button asChild className="rounded-full"><Link to="/commandes/nouvelle"><Plus className="h-4 w-4" />Nouvelle commande</Link></Button>}</div>
+    {blocked && <div role="alert" className="mt-6 border-l-4 border-gold bg-gold-soft p-4 text-sm leading-relaxed text-primary"><p>{readOnly ? readOnlyMessage(data.planAccess) : orderLimitMessage(data.planAccess)}</p><Link to="/tarifs" className="mt-2 inline-block font-semibold underline">Voir les abonnements</Link></div>}
     {alerts.length > 0 && <p className="mt-6 flex items-center gap-2 text-sm text-destructive"><AlertTriangle className="h-4 w-4" />{alerts.length} commande{alerts.length > 1 ? "s" : ""} en retard ou à livrer dans les 3 jours.</p>}
     <div className="mt-6 flex gap-2 overflow-x-auto pb-2">{chip("all", "Toutes")}{chip("alert", "À surveiller")}{ORDER_STATUSES.map((s) => chip(s.value, s.label))}</div>
     {orders.length === 0 ? <div className="py-16 text-center"><ClipboardList className="mx-auto h-10 w-10 text-gold" /><h2 className="mt-4 text-xl text-primary">{data.orders.length ? "Aucune commande pour ce filtre" : "Aucune commande enregistrée"}</h2></div> : <div className="mt-4">

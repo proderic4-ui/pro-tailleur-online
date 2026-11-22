@@ -235,6 +235,7 @@ export type Database = {
         Row: {
           created_at: string
           ends_at: string | null
+          payment_confirmed: boolean
           plan: string
           starts_at: string
           status: string
@@ -243,6 +244,7 @@ export type Database = {
         Insert: {
           created_at?: string
           ends_at?: string | null
+          payment_confirmed?: boolean
           plan?: string
           starts_at?: string
           status?: string
@@ -251,6 +253,7 @@ export type Database = {
         Update: {
           created_at?: string
           ends_at?: string | null
+          payment_confirmed?: boolean
           plan?: string
           starts_at?: string
           status?: string
@@ -268,22 +271,40 @@ export type Database = {
       }
       workshops: {
         Row: {
+          address: string
+          city: string
+          country: string
           created_at: string
+          description: string
+          email: string
           id: string
           name: string
           owner_id: string
+          phone: string
         }
         Insert: {
+          address?: string
+          city?: string
+          country?: string
           created_at?: string
+          description?: string
+          email?: string
           id?: string
           name: string
           owner_id: string
+          phone?: string
         }
         Update: {
+          address?: string
+          city?: string
+          country?: string
           created_at?: string
+          description?: string
+          email?: string
           id?: string
           name?: string
           owner_id?: string
+          phone?: string
         }
         Relationships: [
           {

@@ -7,7 +7,7 @@ const key = process.env['SUPABASE_PUBLISHABLE_KEY'];
 const secret = process.env['SUPABASE_SERVICE_ROLE_KEY'];
 
 describe.skipIf(!url || !key || !secret)("Cloud atelier isolation et limites", () => {
-  it("provisionne gratuitement, isole deux ateliers et refuse le 11e client et la 4e commande", async () => {
+  it("provisionne gratuitement, isole deux ateliers et refuse le 11e client et la 6e commande", async () => {
     if (!url || !key || !secret) throw new Error("Cloud test environment required");
     const options = (apiKey: string) => ({ auth: { storageKey: `test-${randomUUID()}`, persistSession: false, autoRefreshToken: false }, global: { fetch: (input: RequestInfo | URL, init?: RequestInit) => {
       const headers = new Headers(init?.headers);
@@ -59,9 +59,9 @@ describe.skipIf(!url || !key || !secret)("Cloud atelier isolation et limites", (
       expect((await a.client.from("orders").insert({ ...order, title: "Sans client", client_id: null })).error).not.toBeNull();
       expect((await a.client.from("orders").insert({ ...order, title: "Acompte trop grand", deposit: 30000 })).error).not.toBeNull();
       const numbers: number[] = [];
-      for (let index = 0; index < 3; index++) { const r = await a.client.from("orders").insert({ ...order, title: `Commande test ${index}` }).select("order_number, balance").single(); expect(r.error).toBeNull(); expect(r.data?.balance).toBe(15000); numbers.push(r.data?.order_number ?? 0); }
-      expect(numbers).toEqual([1, 2, 3]);
-      expect((await a.client.from("orders").insert({ ...order, title: "Quatrième commande" })).error?.message).toContain("3 maximum");
+      for (let index = 0; index < 5; index++) { const r = await a.client.from("orders").insert({ ...order, title: `Commande test ${index}` }).select("order_number, balance").single(); expect(r.error).toBeNull(); expect(r.data?.balance).toBe(15000); numbers.push(r.data?.order_number ?? 0); }
+      expect(numbers).toEqual([1, 2, 3, 4, 5]);
+      expect((await a.client.from("orders").insert({ ...order, title: "Sixième commande" })).error?.message).toContain("5 maximum");
       // Measurement copy in the order stays unchanged when the client's history gets a new entry.
       await a.client.from("client_measurements").insert({ workshop_id: a.workshop.id, client_id: ownClient.data.id, garment_type: "Chemise", measurements: [{ label: "Poitrine", value: 110, unit: "cm" }] });
       expect((await a.client.from("orders").select("measurements").eq("order_number", 1).single()).data?.measurements).toEqual([{ label: "Poitrine", value: 100, unit: "cm" }]);

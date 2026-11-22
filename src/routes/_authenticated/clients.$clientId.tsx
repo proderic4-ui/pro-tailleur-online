@@ -9,14 +9,19 @@ import { ClientForm } from "@/components/site/ClientForm";
 import { ClientsError, ClientNotFound } from "@/components/site/ClientsError";
 import { clientQuery } from "@/lib/clients.queries";
 import { clientHistoryQuery } from "@/lib/orders.queries";
+import { workshopQuery } from "@/lib/workshop.queries";
 import { fcfa, statusLabel } from "@/lib/garments";
+import { readOnlyMessage } from "@/lib/plans";
 
 export const Route = createFileRoute("/_authenticated/clients/$clientId")({
   loader: async ({ params, context }) => {
     if (!z.string().uuid().safeParse(params.clientId).success) throw notFound();
     const client = await context.queryClient.ensureQueryData(clientQuery(params.clientId));
     if (!client) throw notFound();
-    await context.queryClient.ensureQueryData(clientHistoryQuery(params.clientId));
+    await Promise.all([
+      context.queryClient.ensureQueryData(clientHistoryQuery(params.clientId)),
+      context.queryClient.ensureQueryData(workshopQuery),
+    ]);
   },
   head: () => ({ meta: [
     { title: "Fiche client — Pro Tailleur Online" },
@@ -33,12 +38,15 @@ function ClientDetail() {
   const { clientId } = Route.useParams();
   const { data: client } = useSuspenseQuery(clientQuery(clientId));
   const { data: history } = useSuspenseQuery(clientHistoryQuery(clientId));
+  const { data: workshop } = useSuspenseQuery(workshopQuery);
   const [open, setOpen] = useState(false);
   const [saved, setSaved] = useState(false);
   if (!client) return <ClientNotFound />;
+  const canManage = workshop.planAccess.canManage;
   return <PageShell><section className="mx-auto max-w-5xl px-4 py-10 md:py-12">
     <Link to="/clients" search={{ q: "" }} className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />Retour aux clients</Link>
-    <div className="flex flex-wrap items-start justify-between gap-4"><h1 className="min-w-0 break-words text-3xl text-primary md:text-4xl">{client.full_name}</h1><Button variant="outline" className="shrink-0 rounded-full" onClick={() => { setSaved(false); setOpen(true); }}><Pencil className="h-4 w-4" />Modifier</Button></div>
+    <div className="flex flex-wrap items-start justify-between gap-4"><h1 className="min-w-0 break-words text-3xl text-primary md:text-4xl">{client.full_name}</h1><Button variant="outline" className="shrink-0 rounded-full" disabled={!canManage} onClick={() => { setSaved(false); setOpen(true); }}><Pencil className="h-4 w-4" />Modifier</Button></div>
+    {!canManage && <div role="alert" className="mt-6 border-l-4 border-gold bg-gold-soft p-4 text-sm leading-relaxed text-primary"><p>{readOnlyMessage(workshop.planAccess)}</p><Link to="/tarifs" className="mt-2 inline-block font-semibold underline">Voir les abonnements</Link></div>}
     {saved && <p role="status" className="mt-4 text-sm text-success">Les informations du client ont été mises à jour.</p>}
     <dl className="mt-8 grid gap-x-8 gap-y-6 border-y py-8 sm:grid-cols-2">
       <div><dt className="flex items-center gap-2 text-sm text-muted-foreground"><Phone className="h-4 w-4 text-gold" />Numéro de téléphone</dt><dd className="mt-2 break-all text-primary">{client.phone || "Non renseigné"}</dd></div>
@@ -49,6 +57,6 @@ function ClientDetail() {
     <section className="border-b py-8"><h2 className="text-2xl text-primary">Historique des commandes</h2>{history.orders.length ? <ul className="mt-4 divide-y">{history.orders.map((o) => <li key={o.id}><Link to="/commandes/$orderId" params={{ orderId: o.id }} className="block py-3 hover:bg-muted/60"><span className="font-semibold text-primary">N° {o.order_number} · {o.garment_type}</span><span className="block text-sm text-muted-foreground">{statusLabel(o.status)} · Solde {fcfa(o.balance ?? 0)}</span></Link></li>)}</ul> : <p className="mt-2 text-sm text-muted-foreground">Aucune commande.</p>}</section>
     <section className="border-b py-8"><h2 className="text-2xl text-primary">Historique des mesures</h2>{history.measurements.length ? <ul className="mt-4 space-y-4">{history.measurements.map((m) => <li key={m.id}><p className="text-sm font-semibold text-primary">{new Date(m.taken_at).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })} · {m.garment_type}</p><p className="text-sm text-muted-foreground">{(m.measurements as { label: string; value: number }[]).map((x) => `${x.label} : ${x.value} cm`).join(" · ")}</p></li>)}</ul> : <p className="mt-2 text-sm text-muted-foreground">Aucune mesure enregistrée.</p>}</section>
     <section className="py-8"><h2 className="text-2xl text-primary">Historique des paiements</h2><div className="min-h-16" /></section>
-    <ClientForm open={open} onOpenChange={setOpen} client={{ ...client, phone: client.phone ?? "" }} onSaved={() => { setOpen(false); setSaved(true); }} />
+    {canManage && <ClientForm open={open} onOpenChange={setOpen} client={{ ...client, phone: client.phone ?? "" }} onSaved={() => { setOpen(false); setSaved(true); }} />}
   </section></PageShell>;
 }

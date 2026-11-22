@@ -5,10 +5,13 @@ import { useState } from "react";
 import { ArrowLeft, AlertTriangle, Pencil } from "lucide-react";
 import { z } from "zod";
 import { PageShell } from "@/components/site/ui";
+import { Button } from "@/components/ui/button";
 import { ClientsError } from "@/components/site/ClientsError";
 import { orderQuery } from "@/lib/orders.queries";
+import { workshopQuery } from "@/lib/workshop.queries";
 import { updateOrderStatus } from "@/lib/orders.functions";
 import { ORDER_STATUSES, deliveryAlert, fcfa, type OrderStatus } from "@/lib/garments";
+import { readOnlyMessage } from "@/lib/plans";
 
 function OrderNotFound() {
   return <PageShell><section className="mx-auto max-w-3xl px-4 py-12"><h1 className="text-3xl text-primary">Commande inaccessible</h1><p className="mt-4 text-muted-foreground">Cette commande n’existe pas ou n’appartient pas à votre atelier.</p><Link to="/commandes" search={{ statut: "all" }} className="mt-6 inline-block text-primary underline">Retour aux commandes</Link></section></PageShell>;
@@ -16,7 +19,11 @@ function OrderNotFound() {
 export const Route = createFileRoute("/_authenticated/commandes/$orderId")({
   loader: async ({ params, context }) => {
     if (!z.string().uuid().safeParse(params.orderId).success) throw notFound();
-    if (!(await context.queryClient.ensureQueryData(orderQuery(params.orderId)))) throw notFound();
+    const [order] = await Promise.all([
+      context.queryClient.ensureQueryData(orderQuery(params.orderId)),
+      context.queryClient.ensureQueryData(workshopQuery),
+    ]);
+    if (!order) throw notFound();
   },
   head: () => ({ meta: [
     { title: "Détail de commande — Pro Tailleur Online" },
@@ -33,14 +40,17 @@ export const Route = createFileRoute("/_authenticated/commandes/$orderId")({
 function OrderDetail() {
   const { orderId } = Route.useParams();
   const { data: order } = useSuspenseQuery(orderQuery(orderId));
+  const { data: workshop } = useSuspenseQuery(workshopQuery);
   const queryClient = useQueryClient();
   const update = useServerFn(updateOrderStatus);
   const [msg, setMsg] = useState("");
   if (!order) return <OrderNotFound />;
+  const canManage = workshop.planAccess.canManage;
   const client = order.client as { id: string; full_name: string; phone: string | null } | null;
   const measurements = (order.measurements ?? []) as { label: string; value: number; unit: string }[];
   const alert = deliveryAlert(order);
   async function changeStatus(status: OrderStatus) {
+    if (!canManage) return;
     setMsg("");
     const r = await update({ data: { id: orderId, status } });
     setMsg(r.error ?? "Statut mis à jour.");
@@ -49,10 +59,11 @@ function OrderDetail() {
   const Item = ({ k, v }: { k: string; v: string }) => <div><dt className="text-sm text-muted-foreground">{k}</dt><dd className="mt-1 whitespace-pre-wrap break-words text-primary">{v || "—"}</dd></div>;
   return <PageShell><section className="mx-auto max-w-3xl px-4 py-10">
     <Link to="/commandes" search={{ statut: "all" }} className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />Retour aux commandes</Link>
-    <div className="flex flex-wrap items-start justify-between gap-3"><h1 className="break-words text-3xl text-primary md:text-4xl">Commande N° {order.order_number} · {order.garment_type}</h1><Link to="/commandes/$orderId/modifier" params={{ orderId }} className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary"><Pencil className="h-4 w-4" />Modifier</Link></div>
+    <div className="flex flex-wrap items-start justify-between gap-3"><h1 className="break-words text-3xl text-primary md:text-4xl">Commande N° {order.order_number} · {order.garment_type}</h1>{canManage ? <Link to="/commandes/$orderId/modifier" params={{ orderId }} className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary"><Pencil className="h-4 w-4" />Modifier</Link> : <Button variant="outline" disabled className="rounded-full"><Pencil className="h-4 w-4" />Modifier</Button>}</div>
+    {!canManage && <div role="alert" className="mt-6 border-l-4 border-gold bg-gold-soft p-4 text-sm leading-relaxed text-primary"><p>{readOnlyMessage(workshop.planAccess)}</p><Link to="/tarifs" className="mt-2 inline-block font-semibold underline">Voir les abonnements</Link></div>}
     {client && <p className="mt-2 text-muted-foreground">Client : <Link to="/clients/$clientId" params={{ clientId: client.id }} className="text-primary underline">{client.full_name}</Link></p>}
     {alert && <p className={`mt-3 flex items-center gap-2 text-sm font-semibold ${alert === "late" ? "text-destructive" : "text-gold"}`}><AlertTriangle className="h-4 w-4" />{alert === "late" ? "Date de livraison dépassée" : "Livraison dans les 3 jours"}</p>}
-    <label className="mt-6 block max-w-sm space-y-2 text-sm font-medium"><span>Statut</span><select aria-label="Statut" className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={order.status} onChange={(e) => changeStatus(e.target.value as OrderStatus)}>{ORDER_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}</select></label>
+    <label className="mt-6 block max-w-sm space-y-2 text-sm font-medium"><span>Statut</span><select aria-label="Statut" disabled={!canManage} className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60" value={order.status} onChange={(e) => changeStatus(e.target.value as OrderStatus)}>{ORDER_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}</select></label>
     {msg && <p role="status" className="mt-2 text-sm text-muted-foreground">{msg}</p>}
     <dl className="mt-8 grid gap-6 border-y py-6 sm:grid-cols-3">
       <Item k="Prix total" v={fcfa(order.total_price)} /><Item k="Acompte (saisi manuellement)" v={fcfa(order.deposit)} /><Item k="Solde restant" v={fcfa(order.balance ?? 0)} />

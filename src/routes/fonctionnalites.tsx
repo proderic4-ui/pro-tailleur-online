@@ -6,9 +6,9 @@ export const Route = createFileRoute("/fonctionnalites")({
   head: () => ({
     meta: [
       { title: "Fonctionnalités — Pro Tailleur Online" },
-      { name: "description", content: "Clients, mesures, commandes, paiements, dépenses, statistiques et notifications pour votre atelier." },
+      { name: "description", content: "Clients, mesures, commandes, photos privées, acomptes saisis manuellement et alertes de livraison pour votre atelier." },
       { property: "og:title", content: "Fonctionnalités — Pro Tailleur Online" },
-      { property: "og:description", content: "Tous les outils pour gérer votre atelier de couture." },
+      { property: "og:description", content: "Les outils disponibles pour gérer votre atelier de couture." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

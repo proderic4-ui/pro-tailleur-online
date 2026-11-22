@@ -11,7 +11,8 @@ import { ClientsError } from "@/components/site/ClientsError";
 import { supabase } from "@/integrations/supabase/client";
 import { orderFormQuery } from "@/lib/orders.queries";
 import { addGarmentCategory, createOrder } from "@/lib/orders.functions";
-import { GARMENT_TYPES, balance, fcfa, orderSchema } from "@/lib/garments";
+import { GARMENT_TYPES, balance, fcfa, isFreeOrderLimitReached, orderSchema } from "@/lib/garments";
+import { orderLimitMessage, readOnlyMessage } from "@/lib/plans";
 
 export const Route = createFileRoute("/_authenticated/commandes/nouvelle")({
   loader: ({ context }) => context.queryClient.ensureQueryData(orderFormQuery),
@@ -88,11 +89,14 @@ function NewOrder() {
     } catch (e) { setError(e instanceof Error ? e.message : "Enregistrement impossible."); } finally { setSaving(false); }
   }
   const remaining = balance(Number(total) || 0, Number(deposit) || 0);
+  const readOnly = !data.planAccess.canManage;
+  const atLimit = isFreeOrderLimitReached(data.orderCount, data.limit);
+  const blocked = readOnly || atLimit;
 
   return <PageShell><section className="mx-auto max-w-3xl px-4 py-10">
     <Link to="/commandes" search={{ statut: "all" }} className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />Retour aux commandes</Link>
     <h1 className="text-3xl text-primary md:text-4xl">Nouvelle commande</h1>
-    {data.clients.length === 0 ? <p className="mt-6 text-muted-foreground">Enregistrez d’abord un client. <Link to="/clients" search={{ q: "" }} className="text-primary underline">Aller aux clients</Link></p> :
+    {blocked ? <div role="alert" className="mt-6 border-l-4 border-gold bg-gold-soft p-4 text-sm leading-relaxed text-primary"><p>{readOnly ? readOnlyMessage(data.planAccess) : orderLimitMessage(data.planAccess)}</p><Link to="/tarifs" className="mt-2 inline-block font-semibold underline">Voir les abonnements</Link></div> : data.clients.length === 0 ? <p className="mt-6 text-muted-foreground">Enregistrez d’abord un client. <Link to="/clients" search={{ q: "" }} className="text-primary underline">Aller aux clients</Link></p> :
     <form onSubmit={submit} className="mt-4">
       <Step n={1} title="Client"><Field label="Client *"><select aria-label="Client" className={selectCls} value={clientId} onChange={(e) => { setClientId(e.target.value); if (garment) chooseGarment(garment, e.target.value); }} required><option value="">Choisir un client</option>{data.clients.map((c) => <option key={c.id} value={c.id}>{c.full_name}{c.phone ? ` · ${c.phone}` : ""}</option>)}</select></Field></Step>
       <Step n={2} title="Type de vêtement">

@@ -1,8 +1,21 @@
 import { z } from "zod";
 
+import { resolveSubscriptionAccess, type SubscriptionRecord } from "./plans";
+
 export const FREE_CLIENT_LIMIT = 10;
-export const FREE_ORDER_LIMIT = 3;
-export const FREE_ORDER_MESSAGE = "Vous avez atteint la limite de 3 commandes de la formule gratuite. Passez à l'abonnement Mensuel (2 000 FCFA) ou Annuel (15 000 FCFA) pour enregistrer des commandes illimitées.";
+export const FREE_ORDER_LIMIT = 5;
+export const FREE_ORDER_MESSAGE = "Vous avez atteint la limite de 5 commandes de la formule gratuite. Passez à la formule Simple (2 500 FCFA / mois), Pro (5 000 FCFA / mois) ou Gold (7 500 FCFA / mois) pour continuer à enregistrer des commandes.";
+
+export function isPaidSubscription(
+  plan: SubscriptionRecord | null | undefined,
+  nowMs = Date.now(),
+): boolean {
+  return resolveSubscriptionAccess(plan, new Date(nowMs)).isConfirmedPaid;
+}
+
+export function isFreeOrderLimitReached(orderCount: number, limit: number | null): boolean {
+  return limit !== null && orderCount >= limit;
+}
 
 const shirt = ["Tour de cou", "Poitrine", "Épaules", "Longueur du vêtement", "Longueur des manches", "Tour de poignet"];
 const trousers = ["Taille", "Hanches", "Longueur", "Entrejambe", "Cuisse", "Genou", "Cheville"];

@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { orderFormQuery, orderQuery } from "@/lib/orders.queries";
 import { updateOrder } from "@/lib/orders.functions";
 import { GARMENT_TYPES, balance, fcfa, orderUpdateSchema } from "@/lib/garments";
+import { readOnlyMessage } from "@/lib/plans";
 
 export const Route = createFileRoute("/_authenticated/commandes/$orderId_/modifier")({
   loader: async ({ params, context }) => {
@@ -56,6 +57,7 @@ function EditOrder() {
   const [saving, setSaving] = useState(false);
   const client = o.client as { full_name: string } | null;
   const garmentOptions = garment in types ? Object.keys(types) : [garment, ...Object.keys(types)];
+  const canManage = form.planAccess.canManage;
 
   function chooseGarment(name: string) {
     setGarment(name);
@@ -74,6 +76,7 @@ function EditOrder() {
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError("");
+    if (!canManage) { setError(readOnlyMessage(form.planAccess)); return; }
     const f = Object.fromEntries(new FormData(event.currentTarget)) as Record<string, string>;
     const filled = rows.filter((r) => r.label.trim() && r.value.trim());
     const candidate = { id: orderId, garment_type: garment, description: f["description"] ?? "", colors: f["colors"] ?? "", finishes: f["finishes"] ?? "", notes: f["notes"] ?? "", delivery_date: f["delivery_date"] ?? "", total_price: Number(total || "x"), deposit: Number(deposit || 0), measurements: filled.map((r) => ({ label: r.label.trim(), value: Number(r.value.replace(",", ".")), unit: "cm" as const })), model_photo_path: o.model_photo_path, fabric_photo_path: o.fabric_photo_path };
@@ -94,6 +97,7 @@ function EditOrder() {
     <Link to="/commandes/$orderId" params={{ orderId }} className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" />Retour à la commande</Link>
     <h1 className="text-3xl text-primary md:text-4xl">Modifier la commande N° {o.order_number}</h1>
     <p className="mt-2 text-muted-foreground">Client : {client?.full_name ?? "—"} · créée le {new Date(o.created_at).toLocaleDateString("fr-FR")}</p>
+    {!canManage ? <div role="alert" className="mt-6 border-l-4 border-gold bg-gold-soft p-4 text-sm leading-relaxed text-primary"><p>{readOnlyMessage(form.planAccess)}</p><Link to="/tarifs" className="mt-2 inline-block font-semibold underline">Voir les abonnements</Link></div> :
     <form onSubmit={submit} className="mt-4">
       <Step title="Type de vêtement"><Field label="Vêtement *"><select aria-label="Type de vêtement" className={selectCls} value={garment} onChange={(e) => chooseGarment(e.target.value)} required>{garmentOptions.map((t) => <option key={t} value={t}>{t}</option>)}</select></Field></Step>
       <Step title="Photos">
@@ -117,6 +121,6 @@ function EditOrder() {
       </Step>
       {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
       <div className="mt-6 flex justify-end gap-2"><Link to="/commandes/$orderId" params={{ orderId }} className="inline-flex items-center rounded-full px-4 text-sm text-muted-foreground hover:text-primary">Annuler</Link><Button type="submit" disabled={saving} className="rounded-full">{saving ? "Enregistrement…" : "Enregistrer les modifications"}</Button></div>
-    </form>
+    </form>}
   </section></PageShell>;
 }
